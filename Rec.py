@@ -3,13 +3,13 @@ import torch
 import random
 import numpy as np
 def set_seed(seed=42):
-    random.seed(seed)  # Python 原生随机数
-    np.random.seed(seed)  # numpy 随机数
-    torch.manual_seed(seed)  # CPU 上的 torch 随机数
-    torch.cuda.manual_seed(seed)  # GPU 上的 torch 随机数
-    torch.cuda.manual_seed_all(seed)  # 多 GPU
-    torch.backends.cudnn.deterministic = True  # 保证卷积等操作可复现
-    torch.backends.cudnn.benchmark = False  # 禁用自动算法优化（也有助于可复现）
+    random.seed(seed)  
+    np.random.seed(seed)  
+    torch.manual_seed(seed)  
+    torch.cuda.manual_seed(seed) 
+    torch.cuda.manual_seed_all(seed)  
+    torch.backends.cudnn.deterministic = True 
+    torch.backends.cudnn.benchmark = False  
 
 
 def main(model_config = None):
