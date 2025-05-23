@@ -1,2 +1,2 @@
 # SmokeSVD
-Run python Rec.py to start reconstruction.
+Run ``` python Rec.py ``` to start reconstruction.
