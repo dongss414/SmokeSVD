@@ -7,11 +7,6 @@ class UNet3DMultiView16(nn.Module):
     # Network Architecture is exactly same as UNet+++ and 3D
     def __init__(self,inchannel=16,outchannel=1,fe = [16, 32, 64, 128, 256],modelconfig = None):
         super(UNet3DMultiView16, self).__init__()
-        # f = [64, 128, 256, 256, 512]
-        # f = [16, 32, 32, 64, 64]
-        # f = [16, 32, 64, 128, 256]
-        # f = [32, 64, 128, 256, 512]
-        # f = [8, 16, 32, 64, 128]
         f = fe
         self.ch = modelconfig['den_size'][0]
 
