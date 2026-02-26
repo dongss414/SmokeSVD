@@ -1,0 +1,11 @@
+numpy
+scipy
+matplotlib
+pillow
+opencv-python
+einops
+lpips
+piq
+tqdm
+tensorboard
+protobuf
