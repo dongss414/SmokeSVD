@@ -67,6 +67,9 @@ end_frame = 139
 # Dataset selection
 dataset = "scalarflow"    # options: "scalarflow" or others
 ```
+### Model Weights
+
+Coming soon
 
 ### Run
 
