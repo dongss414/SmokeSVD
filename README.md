@@ -58,7 +58,7 @@ mkdir data
 ```
 # Rec.py
 # Validation sequence index (depends on your dataset numbering, e.g., sim_xxx)
-scalarflow_valindex = 0  
+scalarflow_valindex = [0] 
 
 # Frame range to process
 start_frame = 20          
