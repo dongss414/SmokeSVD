@@ -69,7 +69,7 @@ dataset = "scalarflow"    # options: "scalarflow" or others
 ```
 ### Model Weights
 
-Coming soon
+please refer to  [website]([https://ge.in.tum.de/publications/2019-scalarflow-eckert/](https://github.com/dongss414/SmokeSVD/releases/tag/1.0.0)) and put them in the root directory.
 
 ### Run
 
