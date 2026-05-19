@@ -37,7 +37,8 @@ pip install -r requirements.txt
 ## **Data Preparation**
 
 ```
-# Download Scalarflow datasets, please refer to  [website](https://ge.in.tum.de/publications/2019-scalarflow-eckert/)
+# Download Scalarflow datasets
+please refer to  [website](https://ge.in.tum.de/publications/2019-scalarflow-eckert/)
 
 # Create the data folder
 mkdir data
