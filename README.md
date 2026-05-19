@@ -1,4 +1,4 @@
-# **SmokeSVD: Smoke Reconstruction from A Single View via Progressive Novel View Synthesis and Refinement with Diffusion Models** (CVPR 2026)
+# **SmokeSVD: Smoke Reconstruction from A Single View via Progressive Novel View Synthesis and Refinement with Diffusion Models** (CVPR 2026 Oral)
 
 ![cover](assets/cover.png)
 
@@ -75,6 +75,7 @@ please refer to [website](https://github.com/dongss414/SmokeSVD/releases/tag/1.0
 ### Run
 
 Run `python Rec.py` to start reconstruction.
+You can find the final results in ./Reconstruction.
 
 ---
 
