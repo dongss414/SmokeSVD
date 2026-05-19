@@ -5,7 +5,8 @@ def clampExtrema(old_f, new_f, vx, vy, vz, dt):
 # Move field f according to x and y velocities (u and v) using an implicit Euler integrator.
     zres, yres, xres = old_f.shape
     cell_zs, cell_ys, cell_xs = torch.meshgrid(torch.arange(zres), torch.arange(yres), torch.arange(xres))
-    cell_zs, cell_ys, cell_xs = cell_zs.float().cuda(), cell_ys.float().cuda(), cell_xs.float().cuda()
+    cell_zs, cell_ys, cell_xs = cell_zs.float().to(old_f.device), cell_ys.float().to(old_f.device), cell_xs.float().to(old_f.device)
+    # cell_zs, cell_ys, cell_xs = cell_zs.float(), cell_ys.float(), cell_xs.float()
     center_xs = (cell_xs - vx*dt).flatten()
     center_ys = (cell_ys - vy*dt).flatten()
     center_zs = (cell_zs - vz*dt).flatten()
@@ -53,7 +54,8 @@ def advectSL(f, vx, vy, vz, dt):
 # Move field f according to x and y velocities (u and v) using an implicit Euler integrator.
     zres, yres, xres = f.shape
     cell_zs, cell_ys, cell_xs = torch.meshgrid(torch.arange(zres), torch.arange(yres), torch.arange(xres))
-    cell_zs, cell_ys, cell_xs = cell_zs.float().cuda(), cell_ys.float().cuda(), cell_xs.float().cuda()
+    cell_zs, cell_ys, cell_xs = cell_zs.float().to(f.device), cell_ys.float().to(f.device), cell_xs.float().to(f.device)
+    # cell_zs, cell_ys, cell_xs = cell_zs.float(), cell_ys.float(), cell_xs.float()
     center_xs = (cell_xs - vx*dt).flatten()
     center_ys = (cell_ys - vy*dt).flatten()
     center_zs = (cell_zs - vz*dt).flatten()
@@ -115,6 +117,12 @@ def advection(f, v, source,dt=0.1):
     zres, yres, xres = f.shape
     vx, vy, vz = v[0] * xres, v[1] * yres, v[2] * zres
     return torch.add(advectMacCormack(f, vx, vy, vz, dt), source.reshape(zres, yres, xres)).reshape(f.shape)
+
+def advection_cpu(f, v, source,dt=0.1):
+    zres, yres, xres = f.shape
+    vx, vy, vz = v[0] * xres, v[1] * yres, v[2] * zres
+    return torch.add(advectMacCormack(f, vx, vy, vz, dt), source.reshape(zres, yres, xres)).reshape(f.shape)
+
 def trainAdvection(f, v, source,dt=0.1):
     zres, yres, xres = f.shape
     vx, vy, vz = v[0] * xres, v[1] * yres, v[2] * zres
@@ -167,5 +175,9 @@ def smoke_source(field = None, res = None):
     return field
 
 
+
+
+if __name__ == '__main__':
+    pass
 
 

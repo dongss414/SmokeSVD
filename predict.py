@@ -1,8 +1,9 @@
+import sys
 import  torch
+import torch.nn as nn
 import torch.nn.functional as F
 import os
 from torchvision.utils import save_image
-import torch.nn as nn
 
 class DDIMSampler(nn.Module):
     def __init__(self, model, beta_1, beta_T, T, num_step):
@@ -15,10 +16,14 @@ class DDIMSampler(nn.Module):
         self.seq = range(0, T, skip)
 
 
+
     def compute_alpha(self,beta, t):
         beta = torch.cat([torch.zeros(1).to(beta.device), beta], dim=0).cuda()
         a = (1 - beta).cumprod(dim=0).index_select(0, t + 1).view(-1, 1, 1, 1, 1)
         return a
+
+
+
 
     def forward(self,x, x_front,count=1):
         with torch.no_grad():
@@ -26,12 +31,14 @@ class DDIMSampler(nn.Module):
             seq_next = [-1] + list(self.seq[:-1])
             x0_preds = []
             xs = [x]
+            midx = None
             for i, j in zip(reversed(self.seq), reversed(seq_next)):
                 t = (torch.ones(n,dtype=torch.long) * i).to(x.device)
                 next_t = (torch.ones(n) * j).to(x.device)
                 at = self.compute_alpha(self.betas, t.long())
                 at_next = self.compute_alpha(self.betas, next_t.long())
                 xt = xs[-1]
+
                 et = self.model(xt.float(), t, x_front.float())
                 x0_t = (xt - et * (1 - at).sqrt()) / at.sqrt()
                 x0_preds.append(x0_t)
@@ -44,13 +51,16 @@ class DDIMSampler(nn.Module):
                 # xt_next = at_next.sqrt() * x0_t  + c2 * et
 
                 xs.append(xt_next)
+                if i == 40:
+                    midx = xt_next
 
-        return xs, x0_preds
+        return xs, x0_preds, midx
 
-def predict(images,true_image,model,device,num,modelconfig,savepath,ftmodel=None,ft_prompt = None,frame=None):
+def predict(images,true_image,model,device,num,modelconfig,savepath,ft_prompt = None):
     savepath = f'{savepath}/predict'
     if not os.path.exists(savepath):
         os.mkdir(savepath)
+
     device = torch.device(device)
 
     with torch.no_grad():
@@ -61,10 +71,11 @@ def predict(images,true_image,model,device,num,modelconfig,savepath,ftmodel=None
 
         noisyImage = torch.randn_like(dm_cond, device=device)
         if modelconfig['dataset'] == 'scalarflow':
+
             sampler = DDIMSampler(
                 model, 1e-4, 0.02, 1000,200).to(device)
 
-            _,sampledImgs = sampler(noisyImage, dm_cond)
+            _,sampledImgs,mid = sampler(noisyImage, dm_cond)
             sampledImgs = sampledImgs[-1]
             ft_img = sampledImgs[:,:,:1,:,:]
 
@@ -72,10 +83,12 @@ def predict(images,true_image,model,device,num,modelconfig,savepath,ftmodel=None
         else:
             sampler = DDIMSampler(
                 model, 1e-4, 0.02, 1000, 100).to(device)
-            _, sampledImgs = sampler(noisyImage, dm_cond)
+            _, sampledImgs, mid = sampler(noisyImage, dm_cond)
             sampledImgs = sampledImgs[-1]
             ft_img = sampledImgs[:, :, :1, :, :]
+
         true_image = torch.rot90(true_image[0,0,:,:,:], k=2, dims=(1, 2))
+
         sample = sampledImgs[0,0,0:1,:,:]
         true = true_image
         true_front = images[0, 0, -1:, :, :]
@@ -91,7 +104,6 @@ def predict(images,true_image,model,device,num,modelconfig,savepath,ftmodel=None
         save_image(sample, os.path.join(savepath, f"SampleSide{num}.png"), nrow=1)
 
 
-
         sampledImgs = torch.clamp(sampledImgs,min=0,max=1)
         ft_img = torch.clamp(ft_img,min=0,max=1)
     return sampledImgs,ft_img
@@ -99,18 +111,22 @@ def InitPredict(images,true_image,model,device,num,modelconfig,savepath):
     savepath = f'{savepath}/predict'
     if not os.path.exists(savepath):
         os.mkdir(savepath)
+
     device = torch.device(device)
     noisyImage = torch.randn_like(images, device=device)
     with torch.no_grad():
+
         if modelconfig['dataset'] == 'scalarflow':
+
             sampler = DDIMSampler(
                 model, 1e-4, 0.02, 1000,400).to(device)
-            sampledImgs,_ = sampler(noisyImage, images)
+            sampledImgs,_,_ = sampler(noisyImage, images)
             sampledImgs = sampledImgs[-1] #[1, 1, 2, 64, 64]
         else:
+
             sampler = DDIMSampler(
                 model, 1e-4, 0.02, 1000, 200).to(device)
-            sampledImgs, _ = sampler(noisyImage, images)
+            sampledImgs, _,_ = sampler(noisyImage, images)
             sampledImgs = sampledImgs[-1]
         true_side = torch.rot90(true_image[0,0,:,:,:], k=2, dims=(1, 2))#[2,64,64]
         sample = sampledImgs[0,0]#[2,64,64]
@@ -128,4 +144,10 @@ def InitPredict(images,true_image,model,device,num,modelconfig,savepath):
 
 
 
+
+
+
+
     return sampledImgs
+if __name__ == '__main__':
+    pass
